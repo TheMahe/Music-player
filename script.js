@@ -37,8 +37,24 @@ const songs = [
   },
 ];
 
-// Play or Pause Event Listener
-playBtn.addEventListener("click", () => (isPlaying ? pauseSong() : playSong()));
+function loadSong(song, isSameSong = false) {
+  title.textContent = song.displayName;
+  artist.textContent = song.artist;
+  cover.src = song.cover;
+
+  if (!isSameSong) {
+    music.src = song.src;
+  }
+}
+
+playBtn.addEventListener("click", () => {
+  if (isPlaying) {
+    pauseSong();
+  } else {
+    loadSong(songs[songIndex], isPlaying);
+    playSong();
+  }
+});
 
 // Previous Song Event Listener
 prevBtn.addEventListener("click", prevSong);
@@ -71,16 +87,14 @@ function pauseSong() {
   music.pause();
 }
 
-// Load Song
-function loadSong(song) {
-  const { displayName, artist, src, cover } = song;
-  title.textContent = displayName;
-  artist.textContent = artist;
-  music.src = src;
-  cover.src = cover;
+// Set Progress Bar
+function setProgressBar(e) {
+  const width = this.clientWidth;
+  const clickX = e.offsetX;
+  const { duration } = music;
+  music.currentTime = (clickX / width) * duration;
 }
 
-// Previous Song
 function prevSong() {
   songIndex--;
   if (songIndex < 0) {
@@ -90,7 +104,6 @@ function prevSong() {
   playSong();
 }
 
-// Next Song
 function nextSong() {
   songIndex++;
   if (songIndex > songs.length - 1) {
@@ -121,14 +134,6 @@ function updateProgressBar(e) {
     }
     currentTimeEl.textContent = `${currentMinutes}:${currentSeconds}`;
   }
-}
-
-// Set Progress Bar
-function setProgressBar(e) {
-  const width = this.clientWidth;
-  const clickX = e.offsetX;
-  const { duration } = music;
-  music.currentTime = (clickX / width) * duration;
 }
 
 // Initial Load
