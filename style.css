@@ -81,15 +81,21 @@ h3 {
 /* Controls */
 .player-controls {
   position: relative;
-  top: -15px;
-  left: 120px;
+  top: 5px;
+  left: 100px;
   width: 200px;
+}
+
+.fas:hover {
+  filter: brightness(80%);
 }
 
 .fas {
   font-size: 30px;
   color: rgb(129, 129, 129);
   margin-right: 30px;
+  cursor: pointer;
+  user-select: none;
 }
 
 .main-button {
