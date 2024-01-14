@@ -1,3 +1,4 @@
+// DOM Elements
 const music = document.querySelector("audio");
 const prevBtn = document.getElementById("prev");
 const playBtn = document.getElementById("play");
@@ -10,50 +11,11 @@ const progress = document.getElementById("progress");
 const currentTimeEl = document.getElementById("current-time");
 const durationEl = document.getElementById("duration");
 
-// Check if Playing
+// State
 let isPlaying = false;
-
-// Play
-function playSong() {
-  isPlaying = true;
-  playBtn.classList.replace("fa-play", "fa-pause");
-  playBtn.setAttribute("title", "Pause");
-  music.play();
-}
-
-// Pause
-function pauseSong() {
-  isPlaying = false;
-  playBtn.classList.replace("fa-pause", "fa-play");
-  playBtn.setAttribute("title", "Play");
-  music.pause();
-}
-
-// Play or Pause Event Listener
-playBtn.addEventListener("click", () => (isPlaying ? pauseSong() : playSong()));
-
-// Update DOM
-function loadSong(song) {
-  title.textContent = song.displayName;
-  artist.textContent = song.artist;
-  music.src = song.src;
-  cover.src = song.cover;
-}
-
-// Current Song
 let songIndex = 0;
 
-// Previous Song
-function prevSong() {
-  songIndex--;
-  if (songIndex < 0) {
-    songIndex = songs.length - 1;
-  }
-  loadSong(songs[songIndex]);
-  playSong();
-}
-
-// Example songs data
+// Songs Data
 const songs = [
   {
     displayName: "Electric Chill Machine",
@@ -75,10 +37,60 @@ const songs = [
   },
 ];
 
-// Rest of your code...
+// Play or Pause Event Listener
+playBtn.addEventListener("click", () => (isPlaying ? pauseSong() : playSong()));
+
+// Previous Song Event Listener
+prevBtn.addEventListener("click", prevSong);
+
+// Next Song Event Listener
+nextBtn.addEventListener("click", nextSong);
+
+// Music Ended Event Listener
+music.addEventListener("ended", nextSong);
+
+// Time Update Event Listener
+music.addEventListener("timeupdate", updateProgressBar);
+
+// Progress Container Click Event Listener
+progressContainer.addEventListener("click", setProgressBar);
+
+// Play Song
+function playSong() {
+  isPlaying = true;
+  playBtn.classList.replace("fa-play", "fa-pause");
+  playBtn.setAttribute("title", "Pause");
+  music.play();
+}
+
+// Pause Song
+function pauseSong() {
+  isPlaying = false;
+  playBtn.classList.replace("fa-pause", "fa-play");
+  playBtn.setAttribute("title", "Play");
+  music.pause();
+}
+
+// Load Song
+function loadSong(song) {
+  const { displayName, artist, src, cover } = song;
+  title.textContent = displayName;
+  artist.textContent = artist;
+  music.src = src;
+  cover.src = cover;
+}
+
+// Previous Song
+function prevSong() {
+  songIndex--;
+  if (songIndex < 0) {
+    songIndex = songs.length - 1;
+  }
+  loadSong(songs[songIndex]);
+  playSong();
+}
 
 // Next Song
-
 function nextSong() {
   songIndex++;
   if (songIndex > songs.length - 1) {
@@ -88,29 +100,20 @@ function nextSong() {
   playSong();
 }
 
-// On Load - Select First Song
-
-loadSong(songs[songIndex]);
-
 // Update Progress Bar & Time
-
 function updateProgressBar(e) {
   if (isPlaying) {
     const { duration, currentTime } = e.srcElement;
-    // Update progress bar width
     const progressPercent = (currentTime / duration) * 100;
     progress.style.width = `${progressPercent}%`;
-    // Calculate display for duration
+
     const durationMinutes = Math.floor(duration / 60);
     let durationSeconds = Math.floor(duration % 60);
     if (durationSeconds < 10) {
       durationSeconds = `0${durationSeconds}`;
     }
-    // Delay switching duration Element to avoid NaN
-    if (durationSeconds) {
-      durationEl.textContent = `${durationMinutes}:${durationSeconds}`;
-    }
-    // Calculate display for currentTime
+    durationEl.textContent = `${durationMinutes}:${durationSeconds}`;
+
     const currentMinutes = Math.floor(currentTime / 60);
     let currentSeconds = Math.floor(currentTime % 60);
     if (currentSeconds < 10) {
@@ -128,10 +131,5 @@ function setProgressBar(e) {
   music.currentTime = (clickX / width) * duration;
 }
 
-// Event Listeners
-prevBtn.addEventListener("click", prevSong);
-nextBtn.addEventListener("click", nextSong);
-music.addEventListener("ended", nextSong);
-music.addEventListener("timeupdate", updateProgressBar);
-
-progressContainer.addEventListener("click", setProgressBar);
+// Initial Load
+loadSong(songs[songIndex]);
