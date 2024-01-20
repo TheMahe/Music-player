@@ -12,7 +12,7 @@ const currentTimeEl = document.getElementById("current-time");
 const durationEl = document.getElementById("duration");
 
 // State
-let isPlaying = false;
+const isPlaying = false;
 let songIndex = 0;
 
 // Songs Data
@@ -73,42 +73,36 @@ progressContainer.addEventListener("click", setProgressBar);
 
 // Play Song
 function playSong() {
-  isPlaying = true;
-  playBtn.classList.replace("fa-play", "fa-pause");
-  playBtn.setAttribute("title", "Pause");
+  playBtn.classList.toggle("fa-play");
+  playBtn.classList.toggle("fa-pause");
+  playBtn.setAttribute("title", isPlaying ? "Pause" : "Play");
   music.play();
 }
 
 // Pause Song
 function pauseSong() {
-  isPlaying = false;
-  playBtn.classList.replace("fa-pause", "fa-play");
-  playBtn.setAttribute("title", "Play");
+  playBtn.classList.toggle("fa-play");
+  playBtn.classList.toggle("fa-pause");
+  playBtn.setAttribute("title", isPlaying ? "Pause" : "Play");
   music.pause();
 }
 
 // Set Progress Bar
 function setProgressBar(e) {
   const width = this.clientWidth;
-  const clickX = e.offsetX;
+  const clickX = e.path[0].offsetX;
   const { duration } = music;
   music.currentTime = (clickX / width) * duration;
 }
 
 function prevSong() {
-  songIndex--;
-  if (songIndex < 0) {
-    songIndex = songs.length - 1;
-  }
+  songIndex = (songIndex - 1 + songs.length) % songs.length;
   loadSong(songs[songIndex]);
   playSong();
 }
 
 function nextSong() {
-  songIndex++;
-  if (songIndex > songs.length - 1) {
-    songIndex = 0;
-  }
+  songIndex = (songIndex + 1) % songs.length;
   loadSong(songs[songIndex]);
   playSong();
 }
@@ -121,17 +115,15 @@ function updateProgressBar(e) {
     progress.style.width = `${progressPercent}%`;
 
     const durationMinutes = Math.floor(duration / 60);
-    let durationSeconds = Math.floor(duration % 60);
-    if (durationSeconds < 10) {
-      durationSeconds = `0${durationSeconds}`;
-    }
+    const durationSeconds = Math.floor(duration % 60)
+      .toString()
+      .padStart(2, "0");
     durationEl.textContent = `${durationMinutes}:${durationSeconds}`;
 
     const currentMinutes = Math.floor(currentTime / 60);
-    let currentSeconds = Math.floor(currentTime % 60);
-    if (currentSeconds < 10) {
-      currentSeconds = `0${currentSeconds}`;
-    }
+    const currentSeconds = Math.floor(currentTime % 60)
+      .toString()
+      .padStart(2, "0");
     currentTimeEl.textContent = `${currentMinutes}:${currentSeconds}`;
   }
 }
